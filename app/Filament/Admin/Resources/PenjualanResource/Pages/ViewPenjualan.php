@@ -7,10 +7,12 @@ namespace App\Filament\Admin\Resources\PenjualanResource\Pages;
 use App\Actions\Delivery\AssignDriverAction;
 use App\Actions\Delivery\MarkDeliveredAction;
 use App\Enums\DeliveryStatus;
+use App\Enums\InvoiceFormat;
 use App\Filament\Admin\Resources\PenjualanResource;
 use App\Models\Penjualan;
 use App\Models\Sopir;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
@@ -107,6 +109,28 @@ class ViewPenjualan extends ViewRecord
                 ->color('gray')
                 ->url(fn (): string => route('surat-jalan', $this->getRecord()))
                 ->openUrlInNewTab(),
+
+            ActionGroup::make([
+                Action::make('invoiceA4')
+                    ->label(InvoiceFormat::A4->label())
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn (): string => route('invoice', [$this->getRecord(), InvoiceFormat::A4->value]))
+                    ->openUrlInNewTab(),
+                Action::make('struk58')
+                    ->label(InvoiceFormat::Thermal58->label())
+                    ->icon('heroicon-o-receipt-percent')
+                    ->url(fn (): string => route('invoice', [$this->getRecord(), InvoiceFormat::Thermal58->value]))
+                    ->openUrlInNewTab(),
+                Action::make('struk80')
+                    ->label(InvoiceFormat::Thermal80->label())
+                    ->icon('heroicon-o-receipt-percent')
+                    ->url(fn (): string => route('invoice', [$this->getRecord(), InvoiceFormat::Thermal80->value]))
+                    ->openUrlInNewTab(),
+            ])
+                ->label('Cetak Invoice/Struk')
+                ->icon('heroicon-o-printer')
+                ->color('primary')
+                ->button(),
         ];
     }
 }

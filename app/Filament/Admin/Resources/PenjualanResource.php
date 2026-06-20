@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources;
 
 use App\Enums\DeliveryStatus;
+use App\Enums\InvoiceFormat;
 use App\Enums\PaymentMethod;
 use App\Filament\Admin\Resources\PenjualanResource\Pages;
 use App\Models\Penjualan;
 use App\Models\SatuanProduk;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
@@ -177,6 +180,26 @@ class PenjualanResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make(),
+                ActionGroup::make([
+                    Action::make('invoiceA4')
+                        ->label(InvoiceFormat::A4->label())
+                        ->icon('heroicon-o-document-text')
+                        ->url(fn (Penjualan $record): string => route('invoice', [$record, InvoiceFormat::A4->value]))
+                        ->openUrlInNewTab(),
+                    Action::make('struk58')
+                        ->label(InvoiceFormat::Thermal58->label())
+                        ->icon('heroicon-o-receipt-percent')
+                        ->url(fn (Penjualan $record): string => route('invoice', [$record, InvoiceFormat::Thermal58->value]))
+                        ->openUrlInNewTab(),
+                    Action::make('struk80')
+                        ->label(InvoiceFormat::Thermal80->label())
+                        ->icon('heroicon-o-receipt-percent')
+                        ->url(fn (Penjualan $record): string => route('invoice', [$record, InvoiceFormat::Thermal80->value]))
+                        ->openUrlInNewTab(),
+                ])
+                    ->label('Cetak')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray'),
             ])
             ->bulkActions([]);
     }
