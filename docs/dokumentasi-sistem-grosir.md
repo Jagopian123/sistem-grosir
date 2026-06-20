@@ -545,8 +545,8 @@ Sebuah fitur baru dianggap **selesai** bila semua ini terpenuhi:
 - [ ] Stock opname
 - [ ] Cetak invoice/struk
 - [ ] Tanggal kadaluarsa / batch + alert
-- [ ] Harga bertingkat (opsional)
-- [ ] Promo & diskon (opsional)
+- [x] Harga bertingkat (opsional)
+- [x] Promo & diskon (opsional)
 
 ### Fase 7 — Optimasi, Skala & Integrasi
 - [ ] Redis (cache/queue/session) + cache laporan

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\PenjualanResource\Pages;
 
 use App\Actions\Sales\CreateSaleAction;
+use App\Enums\DiscountType;
 use App\Enums\PaymentMethod;
 use App\Filament\Admin\Resources\PenjualanResource;
 use App\Models\Pelanggan;
@@ -22,10 +23,17 @@ class CreatePenjualan extends CreateRecord
         $metode = PaymentMethod::from($data['metode_bayar']);
         $items = $data['items'] ?? [];
 
+        $diskonTipe = filled($data['diskon_tipe'] ?? null)
+            ? DiscountType::from($data['diskon_tipe'])
+            : null;
+        $diskonNilai = (float) ($data['diskon_nilai'] ?? 0);
+
         $penjualan = app(CreateSaleAction::class)->execute(
             pelanggan: $pelanggan,
             items: $items,
             metode: $metode,
+            diskonTipe: $diskonTipe,
+            diskonNilai: $diskonNilai,
         );
 
         Notification::make()

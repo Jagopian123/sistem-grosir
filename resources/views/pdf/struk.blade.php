@@ -65,6 +65,16 @@
     <div class="hr"></div>
 
     <table class="tot">
+        @if($penjualan->adaDiskon())
+        <tr>
+            <td>Subtotal</td>
+            <td class="r">{{ number_format((float) $penjualan->subtotal, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td>{{ $penjualan->labelDiskon() }}</td>
+            <td class="r">-{{ number_format((float) $penjualan->diskon_nominal, 0, ',', '.') }}</td>
+        </tr>
+        @endif
         <tr class="grand">
             <td>TOTAL</td>
             <td class="r">Rp {{ number_format((float) $penjualan->total, 0, ',', '.') }}</td>

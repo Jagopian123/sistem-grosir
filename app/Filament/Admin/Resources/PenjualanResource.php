@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources;
 
 use App\Enums\DeliveryStatus;
+use App\Enums\DiscountType;
 use App\Enums\InvoiceFormat;
 use App\Enums\PaymentMethod;
 use App\Filament\Admin\Resources\PenjualanResource\Pages;
@@ -118,9 +119,85 @@ class PenjualanResource extends Resource
                         ->columns(['default' => 1, 'md' => 4])
                         ->minItems(1)
                         ->addActionLabel('Tambah Item')
-                        ->reorderable(false),
+                        ->reorderable(false)
+                        ->live(),
                 ]),
+
+            Section::make('Diskon Nota (Opsional)')
+                ->description('Potongan harga di tingkat nota. Kosongkan bila tidak ada diskon. Tidak memengaruhi stok.')
+                ->schema([
+                    Select::make('diskon_tipe')
+                        ->label('Tipe Diskon')
+                        ->options(collect(DiscountType::cases())->mapWithKeys(
+                            fn (DiscountType $t) => [$t->value => $t->label()]
+                        ))
+                        ->placeholder('Tanpa diskon')
+                        ->live()
+                        ->afterStateUpdated(function (?string $state, callable $set): void {
+                            if (blank($state)) {
+                                $set('diskon_nilai', 0);
+                            }
+                        }),
+
+                    TextInput::make('diskon_nilai')
+                        ->label(fn (Get $get): string => $get('diskon_tipe') === DiscountType::Persen->value ? 'Nilai Diskon (%)' : 'Nilai Diskon (Rp)')
+                        ->numeric()
+                        ->minValue(0)
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->visible(fn (Get $get): bool => filled($get('diskon_tipe')))
+                        ->maxValue(fn (Get $get): ?int => $get('diskon_tipe') === DiscountType::Persen->value ? 100 : null),
+
+                    Placeholder::make('ringkasan')
+                        ->label('Ringkasan')
+                        ->content(fn (Get $get) => self::previewRingkasan($get))
+                        ->columnSpanFull(),
+                ])
+                ->columns(['default' => 1, 'md' => 2])
+                ->visibleOn('create'),
         ]);
+    }
+
+    /**
+     * Pratinjau subtotal, diskon, dan total nota di form create.
+     */
+    private static function previewRingkasan(Get $get): string
+    {
+        $rp = fn (float $n): string => 'Rp '.number_format($n, 0, ',', '.');
+
+        $subtotal = 0.0;
+        /** @var array<int, array{satuan_id?: mixed, qty?: mixed}> $items */
+        $items = $get('items') ?? [];
+
+        foreach ($items as $item) {
+            $satuanId = $item['satuan_id'] ?? null;
+            if (blank($satuanId)) {
+                continue;
+            }
+
+            $satuan = SatuanProduk::with('hargaTingkat')->find($satuanId);
+            if (! $satuan) {
+                continue;
+            }
+
+            $qty = max(1, (int) ($item['qty'] ?? 1));
+            $subtotal += $satuan->hargaUntukQty($qty) * $qty;
+        }
+
+        $tipe = $get('diskon_tipe');
+        $nilai = (float) ($get('diskon_nilai') ?? 0);
+
+        $diskon = 0.0;
+        if ($tipe === DiscountType::Persen->value) {
+            $diskon = $subtotal * min($nilai, 100.0) / 100;
+        } elseif ($tipe === DiscountType::Nominal->value) {
+            $diskon = $nilai;
+        }
+        $diskon = round(max(0.0, min($diskon, $subtotal)), 2);
+
+        $total = $subtotal - $diskon;
+
+        return "Subtotal: {$rp($subtotal)}  ·  Diskon: {$rp($diskon)}  ·  Total: {$rp($total)}";
     }
 
     /**
@@ -166,6 +243,14 @@ class PenjualanResource extends Resource
                     ->label('Tanggal')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
+
+                TextColumn::make('diskon_nominal')
+                    ->label('Diskon')
+                    ->money('IDR')
+                    ->sortable()
+                    ->color('warning')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('total')
                     ->label('Total')

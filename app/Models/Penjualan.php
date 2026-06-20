@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\DeliveryStatus;
+use App\Enums\DiscountType;
 use App\Enums\PaymentMethod;
 use App\Models\Concerns\RecordsActivity;
 use Carbon\Carbon;
@@ -20,6 +21,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $pelanggan_id
  * @property int|null $sopir_id
  * @property Carbon $tanggal
+ * @property string $subtotal
+ * @property DiscountType|null $diskon_tipe
+ * @property string $diskon_nilai
+ * @property string $diskon_nominal
  * @property string $total
  * @property PaymentMethod $metode_bayar
  * @property DeliveryStatus $status_kirim
@@ -37,6 +42,10 @@ class Penjualan extends Model
         'pelanggan_id',
         'sopir_id',
         'tanggal',
+        'subtotal',
+        'diskon_tipe',
+        'diskon_nilai',
+        'diskon_nominal',
         'total',
         'metode_bayar',
         'status_kirim',
@@ -48,6 +57,10 @@ class Penjualan extends Model
     {
         return [
             'tanggal' => 'datetime',
+            'subtotal' => 'decimal:2',
+            'diskon_tipe' => DiscountType::class,
+            'diskon_nilai' => 'decimal:2',
+            'diskon_nominal' => 'decimal:2',
             'total' => 'decimal:2',
             'metode_bayar' => PaymentMethod::class,
             'status_kirim' => DeliveryStatus::class,
@@ -70,5 +83,25 @@ class Penjualan extends Model
     public function details(): HasMany
     {
         return $this->hasMany(DetailPenjualan::class);
+    }
+
+    /**
+     * Apakah nota ini punya diskon yang efektif (potongan rupiah > 0).
+     */
+    public function adaDiskon(): bool
+    {
+        return $this->diskon_tipe !== null && (float) $this->diskon_nominal > 0;
+    }
+
+    /**
+     * Label diskon untuk ditampilkan, mis. "Diskon (5%)" atau "Diskon".
+     */
+    public function labelDiskon(): string
+    {
+        if ($this->diskon_tipe === DiscountType::Persen) {
+            return 'Diskon ('.rtrim(rtrim(number_format((float) $this->diskon_nilai, 2, '.', ''), '0'), '.').'%)';
+        }
+
+        return 'Diskon';
     }
 }

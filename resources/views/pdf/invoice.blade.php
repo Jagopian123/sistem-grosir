@@ -125,6 +125,16 @@
             @endforeach
         </tbody>
         <tfoot>
+            @if($penjualan->adaDiskon())
+            <tr>
+                <td colspan="5" class="text-right">Subtotal</td>
+                <td class="text-right">Rp {{ number_format((float) $penjualan->subtotal, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" class="text-right">{{ $penjualan->labelDiskon() }}</td>
+                <td class="text-right">− Rp {{ number_format((float) $penjualan->diskon_nominal, 0, ',', '.') }}</td>
+            </tr>
+            @endif
             <tr class="total-row">
                 <td colspan="5" class="text-right">Total</td>
                 <td class="text-right">Rp {{ number_format((float) $penjualan->total, 0, ',', '.') }}</td>
