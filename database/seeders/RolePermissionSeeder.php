@@ -60,6 +60,7 @@ class RolePermissionSeeder extends Seeder
     {
         return [
             ...$this->forModels(self::CRUD, ['Kategori', 'Produk', 'Pelanggan', 'Supplier', 'Sopir', 'Pembelian', 'Penjualan']),
+            ...$this->forModels(self::CREATE_VIEW, ['ReturPenjualan', 'ReturPembelian']),
             ...$this->forModels(self::READ, ['MutasiStok']),
             'LihatPengiriman',
             'KelolaPengiriman',
@@ -77,7 +78,7 @@ class RolePermissionSeeder extends Seeder
     private function kasirPermissions(): array
     {
         return [
-            ...$this->forModels(self::CREATE_VIEW, ['Penjualan']),
+            ...$this->forModels(self::CREATE_VIEW, ['Penjualan', 'ReturPenjualan']),
             ...$this->forModels(self::READ, ['Produk', 'Pelanggan']),
             'LihatPengiriman',
             'View:RingkasanWidget',
@@ -91,6 +92,7 @@ class RolePermissionSeeder extends Seeder
     {
         return [
             ...$this->forModels(self::CRUD, ['Produk', 'Pembelian']),
+            ...$this->forModels(self::CREATE_VIEW, ['ReturPembelian']),
             ...$this->forModels(self::READ, ['Supplier', 'Kategori', 'MutasiStok']),
             'LihatPengiriman',
             'KelolaPengiriman',
