@@ -86,16 +86,16 @@ test('laporan produk terlaris mengagregasi qty dan omzet per produk', function (
         'subtotal' => 15_000,
     ]);
 
-    $hasil = DetailPenjualan::query()
-        ->join('produks', 'produks.id', '=', 'detail_penjualans.produk_id')
+    $hasil = Produk::query()
+        ->join('detail_penjualans', 'detail_penjualans.produk_id', '=', 'produks.id')
         ->join('penjualans', 'penjualans.id', '=', 'detail_penjualans.penjualan_id')
         ->selectRaw('
-            detail_penjualans.produk_id as id,
+            produks.id,
             produks.nama as produk_nama,
             SUM(detail_penjualans.qty) as total_qty,
             SUM(detail_penjualans.subtotal) as total_omzet
         ')
-        ->groupBy('detail_penjualans.produk_id', 'produks.nama')
+        ->groupBy('produks.id', 'produks.nama')
         ->orderByDesc('total_omzet')
         ->toBase()
         ->get();

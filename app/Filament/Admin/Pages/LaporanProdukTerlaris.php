@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
-use App\Models\DetailPenjualan;
+use App\Models\Produk;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
@@ -40,16 +40,16 @@ class LaporanProdukTerlaris extends Page implements HasActions, HasSchemas, HasT
     {
         return $table
             ->query(
-                DetailPenjualan::query()
-                    ->join('produks', 'produks.id', '=', 'detail_penjualans.produk_id')
+                Produk::query()
+                    ->join('detail_penjualans', 'detail_penjualans.produk_id', '=', 'produks.id')
                     ->join('penjualans', 'penjualans.id', '=', 'detail_penjualans.penjualan_id')
                     ->selectRaw('
-                        detail_penjualans.produk_id as id,
+                        produks.id,
                         produks.nama as produk_nama,
                         SUM(detail_penjualans.qty) as total_qty,
                         SUM(detail_penjualans.subtotal) as total_omzet
                     ')
-                    ->groupBy('detail_penjualans.produk_id', 'produks.nama')
+                    ->groupBy('produks.id', 'produks.nama')
                     ->orderByDesc('total_omzet')
             )
             ->columns([
