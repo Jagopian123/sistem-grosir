@@ -35,10 +35,10 @@ class CreateSaleAction
             ]);
 
             foreach ($items as $item) {
-                $satuan = SatuanProduk::with('produk')->findOrFail($item['satuan_id']);
+                $satuan = SatuanProduk::with(['produk', 'hargaTingkat'])->findOrFail($item['satuan_id']);
                 $qty = (int) $item['qty'];
                 $qtyBase = $qty * $satuan->konversi;
-                $hargaSatuan = (float) $satuan->harga_jual; // snapshot
+                $hargaSatuan = $satuan->hargaUntukQty($qty); // harga bertingkat per qty, di-"foto"
 
                 $penjualan->details()->create([
                     'produk_id' => $satuan->produk_id,

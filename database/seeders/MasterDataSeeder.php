@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\HargaTingkat;
 use App\Models\Kategori;
 use App\Models\Pelanggan;
 use App\Models\Produk;
@@ -18,6 +19,7 @@ class MasterDataSeeder extends Seeder
     {
         $this->seedKategoris();
         $this->seedProduks();
+        $this->seedHargaTingkat();
         $this->seedPelanggans();
         $this->seedSuppliers();
         $this->seedSopirs();
@@ -133,6 +135,36 @@ class MasterDataSeeder extends Seeder
                         $satuanData
                     );
                 }
+            }
+        }
+    }
+
+    /**
+     * Contoh harga bertingkat (grosir per kuantitas) untuk sebagian satuan.
+     * Format: [nama produk, nama satuan] => [min_qty => harga].
+     */
+    private function seedHargaTingkat(): void
+    {
+        $tingkatan = [
+            ['Indomie Goreng', 'dus', [5 => 128_000, 10 => 125_000]],
+            ['Aqua 600ml', 'dus', [10 => 66_000, 25 => 64_000]],
+            ['Gudang Garam Merah', 'slop', [5 => 265_000, 10 => 260_000]],
+        ];
+
+        foreach ($tingkatan as [$namaProduk, $namaSatuan, $tiers]) {
+            $satuan = SatuanProduk::whereHas('produk', fn ($q) => $q->where('nama', $namaProduk))
+                ->where('nama_satuan', $namaSatuan)
+                ->first();
+
+            if (! $satuan) {
+                continue;
+            }
+
+            foreach ($tiers as $minQty => $harga) {
+                HargaTingkat::firstOrCreate(
+                    ['satuan_id' => $satuan->id, 'min_qty' => $minQty],
+                    ['harga' => $harga]
+                );
             }
         }
     }

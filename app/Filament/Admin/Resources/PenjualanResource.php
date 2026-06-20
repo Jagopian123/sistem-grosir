@@ -14,12 +14,14 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -78,7 +80,7 @@ class PenjualanResource extends Resource
                 ->columns(['default' => 1, 'md' => 2]),
 
             Section::make('Item Penjualan')
-                ->description('Pilih produk & satuan, masukkan qty. Harga diambil otomatis dari data satuan.')
+                ->description('Pilih produk & satuan, masukkan qty. Harga otomatis mengikuti tingkat harga grosir sesuai jumlah beli.')
                 ->schema([
                     Repeater::make('items')
                         ->label('')
@@ -96,7 +98,8 @@ class PenjualanResource extends Resource
                                 )
                                 ->searchable()
                                 ->required()
-                                ->columnSpan(3),
+                                ->live()
+                                ->columnSpan(2),
 
                             TextInput::make('qty')
                                 ->label('Qty')
@@ -104,7 +107,13 @@ class PenjualanResource extends Resource
                                 ->required()
                                 ->minValue(1)
                                 ->step(1)
-                                ->default(1),
+                                ->default(1)
+                                ->live(onBlur: true),
+
+                            Placeholder::make('harga_preview')
+                                ->label('Harga Berlaku')
+                                ->content(fn (Get $get): string => self::previewHargaItem($get('satuan_id'), $get('qty')))
+                                ->columnSpan(['default' => 1, 'md' => 2]),
                         ])
                         ->columns(['default' => 1, 'md' => 4])
                         ->minItems(1)
@@ -112,6 +121,30 @@ class PenjualanResource extends Resource
                         ->reorderable(false),
                 ]),
         ]);
+    }
+
+    /**
+     * Pratinjau harga per satuan (mempertimbangkan harga bertingkat) + subtotal untuk item form.
+     */
+    private static function previewHargaItem(mixed $satuanId, mixed $qty): string
+    {
+        if (blank($satuanId)) {
+            return 'Pilih produk & satuan dulu.';
+        }
+
+        $satuan = SatuanProduk::with('hargaTingkat')->find($satuanId);
+
+        if (! $satuan) {
+            return '—';
+        }
+
+        $qty = max(1, (int) $qty);
+        $harga = $satuan->hargaUntukQty($qty);
+        $subtotal = $harga * $qty;
+
+        $rp = fn (float $n): string => 'Rp '.number_format($n, 0, ',', '.');
+
+        return "{$rp($harga)} / satuan  ·  Subtotal {$rp($subtotal)}";
     }
 
     public static function table(Table $table): Table
