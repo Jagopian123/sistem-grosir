@@ -31,4 +31,31 @@ class RecordStockMovementAction
             'stok_sesudah' => $stokSebelum + $delta,
         ]);
     }
+
+    /**
+     * Penyesuaian stok ke hasil hitung fisik (stock opname). Delta bisa positif
+     * (stok lebih) atau negatif (stok kurang). Hanya menulis ledger bila ada
+     * selisih; tipe selalu `penyesuaian`.
+     */
+    public function recordAdjustment(Produk $produk, int $stokFisik, string $referensi): ?MutasiStok
+    {
+        $stokSebelum = $produk->stok;
+        $delta = $stokFisik - $stokSebelum;
+
+        if ($delta === 0) {
+            return null;
+        }
+
+        // Operasi atomik — increment menerima delta negatif untuk pengurangan.
+        $produk->increment('stok', $delta);
+
+        return MutasiStok::create([
+            'produk_id' => $produk->id,
+            'tipe' => StockMovementType::Penyesuaian,
+            'qty' => abs($delta),
+            'referensi' => $referensi,
+            'stok_sebelum' => $stokSebelum,
+            'stok_sesudah' => $stokFisik,
+        ]);
+    }
 }
