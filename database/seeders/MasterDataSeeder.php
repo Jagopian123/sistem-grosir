@@ -41,9 +41,9 @@ class MasterDataSeeder extends Seeder
             [
                 'kategori' => 'Makanan',
                 'produk' => [
-                    ['nama' => 'Indomie Goreng', 'satuan_dasar' => 'pcs', 'stok' => 480, 'stok_min' => 48, 'harga_beli' => 2_800],
-                    ['nama' => 'Indomie Rebus', 'satuan_dasar' => 'pcs', 'stok' => 240, 'stok_min' => 48, 'harga_beli' => 2_700],
-                    ['nama' => 'Beras Premium 5kg', 'satuan_dasar' => 'karung', 'stok' => 100, 'stok_min' => 10, 'harga_beli' => 62_000],
+                    ['nama' => 'Indomie Goreng', 'satuan_dasar' => 'pcs', 'stok' => 480, 'stok_min' => 48, 'harga_beli' => 2_800, 'lacak_kadaluarsa' => true],
+                    ['nama' => 'Indomie Rebus', 'satuan_dasar' => 'pcs', 'stok' => 240, 'stok_min' => 48, 'harga_beli' => 2_700, 'lacak_kadaluarsa' => true],
+                    ['nama' => 'Beras Premium 5kg', 'satuan_dasar' => 'karung', 'stok' => 100, 'stok_min' => 10, 'harga_beli' => 62_000, 'lacak_kadaluarsa' => true],
                 ],
                 'satuan' => [
                     'Indomie Goreng' => [
@@ -62,8 +62,8 @@ class MasterDataSeeder extends Seeder
             [
                 'kategori' => 'Minuman',
                 'produk' => [
-                    ['nama' => 'Aqua 600ml', 'satuan_dasar' => 'botol', 'stok' => 480, 'stok_min' => 24, 'harga_beli' => 2_000],
-                    ['nama' => 'Teh Kotak 250ml', 'satuan_dasar' => 'pcs', 'stok' => 240, 'stok_min' => 24, 'harga_beli' => 2_500],
+                    ['nama' => 'Aqua 600ml', 'satuan_dasar' => 'botol', 'stok' => 480, 'stok_min' => 24, 'harga_beli' => 2_000, 'lacak_kadaluarsa' => true],
+                    ['nama' => 'Teh Kotak 250ml', 'satuan_dasar' => 'pcs', 'stok' => 240, 'stok_min' => 24, 'harga_beli' => 2_500, 'lacak_kadaluarsa' => true],
                 ],
                 'satuan' => [
                     'Aqua 600ml' => [

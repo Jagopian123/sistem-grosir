@@ -102,6 +102,11 @@ class ProdukResource extends Resource
                     Toggle::make('aktif')
                         ->label('Produk Aktif')
                         ->default(true),
+
+                    Toggle::make('lacak_kadaluarsa')
+                        ->label('Lacak Tanggal Kadaluarsa / Batch')
+                        ->helperText('Aktifkan untuk produk yang punya ED (mis. minyak, gula). Stok masuk akan wajib mengisi tanggal kadaluarsa.')
+                        ->default(false),
                 ])
                 ->columns(['default' => 1, 'md' => 2]),
         ]);
@@ -144,6 +149,11 @@ class ProdukResource extends Resource
                     ->label('Aktif')
                     ->boolean()
                     ->visibleFrom('lg'),
+
+                IconColumn::make('lacak_kadaluarsa')
+                    ->label('Lacak ED')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->searchDebounce('500ms')
             ->defaultSort('nama')

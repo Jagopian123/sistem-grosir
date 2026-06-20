@@ -28,6 +28,9 @@ class RolePermissionSeeder extends Seeder
 
     private const CREATE_VIEW = ['ViewAny', 'View', 'Create'];
 
+    /** Lihat + koreksi (mis. batch: ED/kode boleh dikoreksi, qty tidak). */
+    private const READ_UPDATE = ['ViewAny', 'View', 'Update'];
+
     public function run(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -62,6 +65,7 @@ class RolePermissionSeeder extends Seeder
             ...$this->forModels(self::CRUD, ['Kategori', 'Produk', 'Pelanggan', 'Supplier', 'Sopir', 'Pembelian', 'Penjualan']),
             ...$this->forModels(self::CREATE_VIEW, ['ReturPenjualan', 'ReturPembelian', 'StockOpname']),
             ...$this->forModels(self::READ, ['MutasiStok']),
+            ...$this->forModels(self::READ_UPDATE, ['BatchStok']),
             'LihatPengiriman',
             'KelolaPengiriman',
             'View:LaporanPenjualan',
@@ -69,6 +73,7 @@ class RolePermissionSeeder extends Seeder
             'View:LaporanStok',
             'View:RingkasanWidget',
             'View:StokMenipisWidget',
+            'View:BatchKadaluarsaWidget',
         ];
     }
 
@@ -93,11 +98,13 @@ class RolePermissionSeeder extends Seeder
         return [
             ...$this->forModels(self::CRUD, ['Produk', 'Pembelian']),
             ...$this->forModels(self::CREATE_VIEW, ['ReturPembelian', 'StockOpname']),
+            ...$this->forModels(self::READ_UPDATE, ['BatchStok']),
             ...$this->forModels(self::READ, ['Supplier', 'Kategori', 'MutasiStok']),
             'LihatPengiriman',
             'KelolaPengiriman',
             'View:LaporanStok',
             'View:StokMenipisWidget',
+            'View:BatchKadaluarsaWidget',
         ];
     }
 

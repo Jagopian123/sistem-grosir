@@ -8,12 +8,14 @@ use App\Filament\Admin\Resources\PembelianResource\Pages;
 use App\Models\Pembelian;
 use App\Models\Produk;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -74,6 +76,7 @@ class PembelianResource extends Resource
                                 )
                                 ->searchable()
                                 ->required()
+                                ->live()
                                 ->columnSpan(2),
 
                             TextInput::make('qty')
@@ -89,6 +92,21 @@ class PembelianResource extends Resource
                                 ->prefix('Rp')
                                 ->required()
                                 ->minValue(0),
+
+                            // Batch & ED hanya untuk produk yang dilacak kadaluarsanya.
+                            DatePicker::make('tanggal_kadaluarsa')
+                                ->label('Tanggal Kadaluarsa (ED)')
+                                ->native(false)
+                                ->minDate(now())
+                                ->visible(fn (Get $get): bool => self::produkLacakKadaluarsa($get('produk_id')))
+                                ->required(fn (Get $get): bool => self::produkLacakKadaluarsa($get('produk_id')))
+                                ->columnSpan(2),
+
+                            TextInput::make('kode_batch')
+                                ->label('Kode Batch (opsional)')
+                                ->maxLength(255)
+                                ->visible(fn (Get $get): bool => self::produkLacakKadaluarsa($get('produk_id')))
+                                ->columnSpan(2),
                         ])
                         ->columns(['default' => 1, 'md' => 4])
                         ->minItems(1)
@@ -96,6 +114,16 @@ class PembelianResource extends Resource
                         ->reorderable(false),
                 ]),
         ]);
+    }
+
+    /** Apakah produk terpilih dilacak tanggal kadaluarsanya. */
+    private static function produkLacakKadaluarsa(mixed $produkId): bool
+    {
+        if (blank($produkId)) {
+            return false;
+        }
+
+        return (bool) Produk::whereKey($produkId)->value('lacak_kadaluarsa');
     }
 
     public static function table(Table $table): Table

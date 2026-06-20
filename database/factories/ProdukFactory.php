@@ -26,7 +26,13 @@ class ProdukFactory extends Factory
             'stok_min' => $this->faker->numberBetween(5, 30),
             'harga_beli' => $this->faker->numberBetween(1_000, 50_000),
             'aktif' => true,
+            'lacak_kadaluarsa' => false,
         ];
+    }
+
+    public function lacakKadaluarsa(): static
+    {
+        return $this->state(['lacak_kadaluarsa' => true]);
     }
 
     public function nonaktif(): static

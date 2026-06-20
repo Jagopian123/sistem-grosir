@@ -27,6 +27,7 @@ class Produk extends Model
         'stok_min',
         'harga_beli',
         'aktif',
+        'lacak_kadaluarsa',
     ];
 
     /** @return array<string, string> */
@@ -37,6 +38,7 @@ class Produk extends Model
             'stok_min' => 'integer',
             'harga_beli' => 'decimal:2',
             'aktif' => 'boolean',
+            'lacak_kadaluarsa' => 'boolean',
         ];
     }
 
@@ -56,6 +58,12 @@ class Produk extends Model
     public function mutasiStok(): HasMany
     {
         return $this->hasMany(MutasiStok::class);
+    }
+
+    /** @return HasMany<BatchStok, $this> */
+    public function batchStok(): HasMany
+    {
+        return $this->hasMany(BatchStok::class);
     }
 
     /** @return HasMany<DetailPenjualan, $this> */
@@ -81,5 +89,12 @@ class Produk extends Model
     public function scopeLowStock(Builder $query): void
     {
         $query->whereColumn('stok', '<=', 'stok_min');
+    }
+
+    /** Produk yang dilacak tanggal kadaluarsa/batch-nya */
+    /** @param Builder<Produk> $query */
+    public function scopeLacakKadaluarsa(Builder $query): void
+    {
+        $query->where('lacak_kadaluarsa', true);
     }
 }

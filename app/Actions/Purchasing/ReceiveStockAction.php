@@ -19,7 +19,7 @@ class ReceiveStockAction
     ) {}
 
     /**
-     * @param  array<int, array{produk_id: int, qty: int, harga_beli: float|int}>  $items
+     * @param  array<int, array{produk_id: int, qty: int, harga_beli: float|int, tanggal_kadaluarsa?: string|null, kode_batch?: string|null}>  $items
      */
     public function execute(Supplier $supplier, array $items, Carbon $tanggal): Pembelian
     {
@@ -36,6 +36,18 @@ class ReceiveStockAction
                 $qty = (int) $item['qty'];
                 $hargaBeli = (float) $item['harga_beli'];
 
+                $tanggalKadaluarsa = ! empty($item['tanggal_kadaluarsa'])
+                    ? Carbon::parse($item['tanggal_kadaluarsa'])
+                    : null;
+                $kodeBatch = $item['kode_batch'] ?? null;
+
+                // Produk yang dilacak kadaluarsanya wajib mengisi tanggal ED.
+                if ($produk->lacak_kadaluarsa && $tanggalKadaluarsa === null) {
+                    throw new \RuntimeException(
+                        "Produk {$produk->nama} wajib mengisi tanggal kadaluarsa."
+                    );
+                }
+
                 $pembelian->details()->create([
                     'produk_id' => $produk->id,
                     'qty' => $qty,
@@ -51,6 +63,8 @@ class ReceiveStockAction
                     tipe: StockMovementType::Masuk,
                     qtyBase: $qty,
                     referensi: "pembelian:{$pembelian->id}",
+                    tanggalKadaluarsa: $tanggalKadaluarsa,
+                    kodeBatch: $kodeBatch,
                 );
             }
 
