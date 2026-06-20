@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\DeliveryStatus;
 use App\Enums\PaymentMethod;
+use Carbon\Carbon;
 use Database\Factories\PenjualanFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $no_invoice
  * @property int $pelanggan_id
  * @property int|null $sopir_id
- * @property \Carbon\Carbon $tanggal
+ * @property Carbon $tanggal
  * @property string $total
  * @property PaymentMethod $metode_bayar
  * @property DeliveryStatus $status_kirim
