@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Pages;
 
 use App\Models\Produk;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Pages\Page;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LaporanStok extends Page implements HasActions, HasSchemas, HasTable
 {
+    use HasPageShield;
     use InteractsWithActions;
     use InteractsWithSchemas;
     use InteractsWithTable;

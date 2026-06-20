@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Produk;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class StokMenipisWidget extends BaseWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = -4;
 
     protected int|string|array $columnSpan = 'full';

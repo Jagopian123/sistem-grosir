@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsActivity;
 use Database\Factories\ProdukFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +16,8 @@ class Produk extends Model
 {
     /** @use HasFactory<ProdukFactory> */
     use HasFactory;
+
+    use RecordsActivity;
 
     protected $fillable = [
         'kategori_id',

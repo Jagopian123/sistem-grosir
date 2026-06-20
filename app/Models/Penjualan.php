@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\DeliveryStatus;
 use App\Enums\PaymentMethod;
+use App\Models\Concerns\RecordsActivity;
 use Carbon\Carbon;
 use Database\Factories\PenjualanFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,8 @@ class Penjualan extends Model
 {
     /** @use HasFactory<PenjualanFactory> */
     use HasFactory;
+
+    use RecordsActivity;
 
     protected $fillable = [
         'no_invoice',

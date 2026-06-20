@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Pages;
 
 use App\Enums\PaymentMethod;
 use App\Models\Penjualan;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LaporanPenjualan extends Page implements HasActions, HasSchemas, HasTable
 {
+    use HasPageShield;
     use InteractsWithActions;
     use InteractsWithSchemas;
     use InteractsWithTable;

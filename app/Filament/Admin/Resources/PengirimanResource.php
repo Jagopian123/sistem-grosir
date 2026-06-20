@@ -38,6 +38,15 @@ class PengirimanResource extends Resource
 
     protected static ?string $slug = 'pengiriman';
 
+    /**
+     * PengirimanResource berbagi model Penjualan dengan PenjualanResource, jadi
+     * akses-nya digerakkan oleh izin khusus (bukan policy model Penjualan).
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('LihatPengiriman') ?? false;
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -109,7 +118,8 @@ class PengirimanResource extends Resource
                     ->label('Assign Sopir')
                     ->icon('heroicon-o-user-plus')
                     ->color('warning')
-                    ->visible(fn (Penjualan $record): bool => $record->status_kirim === DeliveryStatus::SiapKirim)
+                    ->visible(fn (Penjualan $record): bool => $record->status_kirim === DeliveryStatus::SiapKirim
+                        && (auth()->user()?->can('KelolaPengiriman') ?? false))
                     ->form([
                         Select::make('sopir_id')
                             ->label('Pilih Sopir')
@@ -143,7 +153,8 @@ class PengirimanResource extends Resource
                     ->label('Tandai Terkirim')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Penjualan $record): bool => $record->status_kirim === DeliveryStatus::Dikirim)
+                    ->visible(fn (Penjualan $record): bool => $record->status_kirim === DeliveryStatus::Dikirim
+                        && (auth()->user()?->can('KelolaPengiriman') ?? false))
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Terkirim')
                     ->modalDescription(fn (Penjualan $record): string => "Tandai {$record->no_invoice} ke {$record->pelanggan->nama_toko} sebagai sudah terkirim?")

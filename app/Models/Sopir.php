@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsActivity;
 use Database\Factories\SopirFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,8 @@ class Sopir extends Model
 {
     /** @use HasFactory<SopirFactory> */
     use HasFactory;
+
+    use RecordsActivity;
 
     protected $fillable = [
         'nama',
