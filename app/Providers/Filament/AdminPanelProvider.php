@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Sistem Grosir')
+            ->databaseNotifications()
             ->colors([
                 'primary' => Color::Blue,
             ])

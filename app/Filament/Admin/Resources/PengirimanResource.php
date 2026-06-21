@@ -8,9 +8,11 @@ use App\Actions\Delivery\AssignDriverAction;
 use App\Actions\Delivery\MarkDeliveredAction;
 use App\Enums\DeliveryStatus;
 use App\Filament\Admin\Resources\PengirimanResource\Pages;
+use App\Jobs\GenerateBulkSuratJalanJob;
 use App\Models\Penjualan;
 use App\Models\Sopir;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -19,6 +21,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class PengirimanResource extends Resource
 {
@@ -184,7 +187,29 @@ class PengirimanResource extends Resource
                     ->url(fn (Penjualan $record): string => route('surat-jalan', $record))
                     ->openUrlInNewTab(),
             ])
-            ->bulkActions([]);
+            ->bulkActions([
+                BulkAction::make('cetakSuratJalanMassal')
+                    ->label('Cetak Surat Jalan (Massal)')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->modalHeading('Cetak Surat Jalan Massal')
+                    ->modalDescription('Surat jalan akan digabung jadi satu PDF di latar belakang. Anda akan menerima notifikasi berisi tautan unduh saat selesai.')
+                    ->modalSubmitActionLabel('Proses di Latar Belakang')
+                    ->deselectRecordsAfterCompletion()
+                    ->action(function (EloquentCollection $records): void {
+                        // Pekerjaan berat (render PDF) dipindah ke queue agar tidak memblokir UI.
+                        $ids = array_map(intval(...), $records->modelKeys());
+
+                        GenerateBulkSuratJalanJob::dispatch($ids, (int) auth()->id());
+
+                        Notification::make()
+                            ->title('Sedang diproses')
+                            ->body($records->count().' surat jalan sedang dibuat di latar belakang. Notifikasi tautan unduh akan muncul saat selesai.')
+                            ->success()
+                            ->send();
+                    }),
+            ]);
     }
 
     public static function getRelations(): array
