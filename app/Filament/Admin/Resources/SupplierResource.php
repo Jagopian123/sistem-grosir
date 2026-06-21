@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class SupplierResource extends Resource
@@ -69,7 +70,7 @@ class SupplierResource extends Resource
             ->columns([
                 TextColumn::make('nama')
                     ->label('Nama Supplier')
-                    ->searchable()
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereFullTextSearch($search))
                     ->sortable()
                     ->weight('medium'),
 

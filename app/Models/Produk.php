@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\RecordsActivity;
+use App\Models\Concerns\SearchableFullText;
 use Database\Factories\ProdukFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ class Produk extends Model
     use HasFactory;
 
     use RecordsActivity;
+    use SearchableFullText;
 
     protected $fillable = [
         'kategori_id',
@@ -29,6 +31,12 @@ class Produk extends Model
         'aktif',
         'lacak_kadaluarsa',
     ];
+
+    /** @return list<string> */
+    public function fullTextColumns(): array
+    {
+        return ['nama'];
+    }
 
     /** @return array<string, string> */
     protected function casts(): array

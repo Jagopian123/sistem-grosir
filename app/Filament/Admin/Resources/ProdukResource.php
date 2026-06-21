@@ -118,7 +118,7 @@ class ProdukResource extends Resource
             ->columns([
                 TextColumn::make('nama')
                     ->label('Nama Produk')
-                    ->searchable()
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereFullTextSearch($search))
                     ->sortable()
                     ->weight('medium'),
 

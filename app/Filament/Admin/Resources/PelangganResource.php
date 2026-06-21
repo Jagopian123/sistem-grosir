@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class PelangganResource extends Resource
@@ -73,7 +74,7 @@ class PelangganResource extends Resource
             ->columns([
                 TextColumn::make('nama_toko')
                     ->label('Nama Toko')
-                    ->searchable()
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereFullTextSearch($search))
                     ->sortable()
                     ->weight('medium'),
 

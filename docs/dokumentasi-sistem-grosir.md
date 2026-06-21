@@ -550,7 +550,7 @@ Sebuah fitur baru dianggap **selesai** bila semua ini terpenuhi:
 
 ### Fase 7 — Optimasi, Skala & Integrasi
 - [x] Redis (cache/queue/session) + cache laporan
-- [ ] Search instan (FULLTEXT / Scout)
+- [x] Search instan (FULLTEXT / Scout)
 - [ ] Queue untuk tugas berat
 - [ ] Notifikasi WA/email
 - [ ] Export Excel/PDF
