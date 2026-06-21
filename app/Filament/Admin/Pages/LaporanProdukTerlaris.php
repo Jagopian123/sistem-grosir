@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
-use App\Models\Produk;
+use App\Filament\Admin\Pages\Concerns\DapatMengeksporLaporan;
+use App\Support\Laporan\Definisi\LaporanProdukTerlarisExport;
+use App\Support\Laporan\DefinisiLaporan;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -21,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LaporanProdukTerlaris extends Page implements HasActions, HasSchemas, HasTable
 {
+    use DapatMengeksporLaporan;
     use HasPageShield;
     use InteractsWithActions;
     use InteractsWithSchemas;
@@ -38,22 +41,15 @@ class LaporanProdukTerlaris extends Page implements HasActions, HasSchemas, HasT
 
     protected string $view = 'filament.admin.pages.laporan-produk-terlaris';
 
+    protected function definisiExport(): DefinisiLaporan
+    {
+        return new LaporanProdukTerlarisExport;
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Produk::query()
-                    ->join('detail_penjualans', 'detail_penjualans.produk_id', '=', 'produks.id')
-                    ->join('penjualans', 'penjualans.id', '=', 'detail_penjualans.penjualan_id')
-                    ->selectRaw('
-                        produks.id,
-                        produks.nama as produk_nama,
-                        SUM(detail_penjualans.qty) as total_qty,
-                        SUM(detail_penjualans.subtotal) as total_omzet
-                    ')
-                    ->groupBy('produks.id', 'produks.nama')
-                    ->orderByDesc('total_omzet')
-            )
+            ->query($this->definisiExport()->baseQuery())
             ->columns([
                 TextColumn::make('produk_nama')
                     ->label('Produk')

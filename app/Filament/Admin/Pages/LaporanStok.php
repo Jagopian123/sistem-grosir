@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Pages\Concerns\DapatMengeksporLaporan;
 use App\Models\Produk;
+use App\Support\Laporan\Definisi\LaporanStokExport;
+use App\Support\Laporan\DefinisiLaporan;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -21,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LaporanStok extends Page implements HasActions, HasSchemas, HasTable
 {
+    use DapatMengeksporLaporan;
     use HasPageShield;
     use InteractsWithActions;
     use InteractsWithSchemas;
@@ -38,15 +42,15 @@ class LaporanStok extends Page implements HasActions, HasSchemas, HasTable
 
     protected string $view = 'filament.admin.pages.laporan-stok';
 
+    protected function definisiExport(): DefinisiLaporan
+    {
+        return new LaporanStokExport;
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Produk::query()
-                    ->with('kategori')
-                    ->select(['id', 'kategori_id', 'nama', 'satuan_dasar', 'stok', 'stok_min', 'harga_beli', 'aktif'])
-                    ->orderBy('nama')
-            )
+            ->query($this->definisiExport()->baseQuery())
             ->columns([
                 TextColumn::make('nama')
                     ->label('Produk')

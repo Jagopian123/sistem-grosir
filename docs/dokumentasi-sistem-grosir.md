@@ -553,7 +553,7 @@ Sebuah fitur baru dianggap **selesai** bila semua ini terpenuhi:
 - [x] Search instan (FULLTEXT / Scout)
 - [x] Queue untuk tugas berat
 - [ ] Notifikasi WA/email
-- [ ] Export Excel/PDF
+- [x] Export Excel/PDF
 - [ ] Audit performa & index
 - [ ] (Opsional) multi-gudang, API + app sopir, Octane
 

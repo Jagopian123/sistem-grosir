@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
-use App\Models\Penjualan;
+use App\Filament\Admin\Pages\Concerns\DapatMengeksporLaporan;
+use App\Support\Laporan\Definisi\LaporanLabaKotorExport;
+use App\Support\Laporan\DefinisiLaporan;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -21,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LaporanLabaKotor extends Page implements HasActions, HasSchemas, HasTable
 {
+    use DapatMengeksporLaporan;
     use HasPageShield;
     use InteractsWithActions;
     use InteractsWithSchemas;
@@ -38,33 +41,15 @@ class LaporanLabaKotor extends Page implements HasActions, HasSchemas, HasTable
 
     protected string $view = 'filament.admin.pages.laporan-laba-kotor';
 
+    protected function definisiExport(): DefinisiLaporan
+    {
+        return new LaporanLabaKotorExport;
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Penjualan::query()
-                    ->join('detail_penjualans', 'detail_penjualans.penjualan_id', '=', 'penjualans.id')
-                    ->join('satuan_produks', 'satuan_produks.id', '=', 'detail_penjualans.satuan_id')
-                    ->join('produks', 'produks.id', '=', 'detail_penjualans.produk_id')
-                    ->join('pelanggans', 'pelanggans.id', '=', 'penjualans.pelanggan_id')
-                    ->selectRaw('
-                        penjualans.id,
-                        penjualans.no_invoice,
-                        penjualans.tanggal,
-                        pelanggans.nama_toko as pelanggan_nama,
-                        penjualans.total as omzet,
-                        COALESCE(SUM(detail_penjualans.qty * satuan_produks.konversi * produks.harga_beli), 0) as hpp,
-                        penjualans.total - COALESCE(SUM(detail_penjualans.qty * satuan_produks.konversi * produks.harga_beli), 0) as laba_kotor
-                    ')
-                    ->groupBy(
-                        'penjualans.id',
-                        'penjualans.no_invoice',
-                        'penjualans.tanggal',
-                        'pelanggans.nama_toko',
-                        'penjualans.total'
-                    )
-                    ->orderByDesc('penjualans.tanggal')
-            )
+            ->query($this->definisiExport()->baseQuery())
             ->columns([
                 TextColumn::make('no_invoice')
                     ->label('No. Invoice')

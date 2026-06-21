@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Pages;
 
 use App\Enums\PaymentMethod;
-use App\Models\Penjualan;
+use App\Filament\Admin\Pages\Concerns\DapatMengeksporLaporan;
+use App\Support\Laporan\Definisi\LaporanPenjualanExport;
+use App\Support\Laporan\DefinisiLaporan;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -23,6 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LaporanPenjualan extends Page implements HasActions, HasSchemas, HasTable
 {
+    use DapatMengeksporLaporan;
     use HasPageShield;
     use InteractsWithActions;
     use InteractsWithSchemas;
@@ -40,14 +43,15 @@ class LaporanPenjualan extends Page implements HasActions, HasSchemas, HasTable
 
     protected string $view = 'filament.admin.pages.laporan-penjualan';
 
+    protected function definisiExport(): DefinisiLaporan
+    {
+        return new LaporanPenjualanExport;
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Penjualan::query()
-                    ->with(['pelanggan'])
-                    ->latest('tanggal')
-            )
+            ->query($this->definisiExport()->baseQuery())
             ->columns([
                 TextColumn::make('no_invoice')
                     ->label('No. Invoice')

@@ -16,16 +16,24 @@ class UnduhanController extends Controller
 {
     private const DISK = 'local';
 
-    private const DIREKTORI = 'surat-jalan';
-
     public function suratJalan(string $file): StreamedResponse
+    {
+        return $this->unduh('surat-jalan', $file);
+    }
+
+    public function laporan(string $file): StreamedResponse
+    {
+        return $this->unduh('laporan', $file);
+    }
+
+    private function unduh(string $direktori, string $file): StreamedResponse
     {
         // Cegah path traversal: hanya nama file polos yang diterima.
         if ($file !== basename($file)) {
             throw new NotFoundHttpException;
         }
 
-        $path = self::DIREKTORI.'/'.$file;
+        $path = $direktori.'/'.$file;
         $disk = Storage::disk(self::DISK);
 
         if (! $disk->exists($path)) {

@@ -13,6 +13,10 @@ Route::get('/unduhan/surat-jalan/{file}', [UnduhanController::class, 'suratJalan
     ->middleware(['auth', 'signed'])
     ->name('unduhan.surat-jalan');
 
+Route::get('/unduhan/laporan/{file}', [UnduhanController::class, 'laporan'])
+    ->middleware(['auth', 'signed'])
+    ->name('unduhan.laporan');
+
 Route::get('/surat-jalan/{penjualan}', SuratJalanController::class)
     ->middleware(['auth'])
     ->name('surat-jalan');
