@@ -549,7 +549,7 @@ Sebuah fitur baru dianggap **selesai** bila semua ini terpenuhi:
 - [x] Promo & diskon (opsional)
 
 ### Fase 7 — Optimasi, Skala & Integrasi
-- [ ] Redis (cache/queue/session) + cache laporan
+- [x] Redis (cache/queue/session) + cache laporan
 - [ ] Search instan (FULLTEXT / Scout)
 - [ ] Queue untuk tugas berat
 - [ ] Notifikasi WA/email

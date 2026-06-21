@@ -1,0 +1,22 @@
+# Redis khusus untuk Sistem Grosir (cache / queue / session).
+# Port host 6380 dipakai agar tidak bentrok dengan container Redis proyek lain di 6379.
+# Jalankan: docker compose up -d
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: sistem-grosir-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:
+    driver: local

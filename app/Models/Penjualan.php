@@ -8,8 +8,10 @@ use App\Enums\DeliveryStatus;
 use App\Enums\DiscountType;
 use App\Enums\PaymentMethod;
 use App\Models\Concerns\RecordsActivity;
+use App\Observers\PenjualanObserver;
 use Carbon\Carbon;
 use Database\Factories\PenjualanFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property DeliveryStatus $status_kirim
  * @property string|null $catatan
  */
+#[ObservedBy(PenjualanObserver::class)]
 class Penjualan extends Model
 {
     /** @use HasFactory<PenjualanFactory> */

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Widgets;
 
-use App\Models\Penjualan;
+use App\Support\RingkasanPenjualanCache;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -17,14 +17,12 @@ class RingkasanWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $omzetHariIni = (float) Penjualan::whereDate('tanggal', today())->sum('total');
-        $omzetBulanIni = (float) Penjualan::whereMonth('tanggal', now()->month)
-            ->whereYear('tanggal', now()->year)
-            ->sum('total');
-        $transaksiHariIni = Penjualan::whereDate('tanggal', today())->count();
-        $transaksiBulanIni = Penjualan::whereMonth('tanggal', now()->month)
-            ->whereYear('tanggal', now()->year)
-            ->count();
+        $ringkasan = app(RingkasanPenjualanCache::class)->ambil();
+
+        $omzetHariIni = $ringkasan['omzet_hari'];
+        $omzetBulanIni = $ringkasan['omzet_bulan'];
+        $transaksiHariIni = $ringkasan['transaksi_hari'];
+        $transaksiBulanIni = $ringkasan['transaksi_bulan'];
 
         return [
             Stat::make('Omzet Hari Ini', 'Rp '.number_format($omzetHariIni, 0, ',', '.'))
